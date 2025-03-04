@@ -1,8 +1,9 @@
 import React, { PureComponent } from "react";
 import { StyleSheet, StatusBar } from "react-native";
 import { GameEngine } from "react-native-game-engine";
-import { Finger } from "./Finger";
-import { MoveFinger } from "./system";
+import Input from "../systems/Input";
+import Physics from "../systems/Physics";
+import entities from "../entities";
 
 /**
  * Game screen component.
@@ -17,13 +18,12 @@ export default class GameScreen extends PureComponent {
     return (
       <GameEngine
         style={styles.gameContainer}
-        systems={[MoveFinger]}
-        entities={{
-          1: { position: [40, 200], renderer: <Finger /> },
-          2: { position: [100, 200], renderer: <Finger /> },
-          3: { position: [160, 200], renderer: <Finger /> },
-          4: { position: [220, 200], renderer: <Finger /> },
-          5: { position: [280, 200], renderer: <Finger /> },
+        systems={[Input, Physics]}
+        entities={entities()}
+        onEvent={(e) => {
+          if (e.type === "game-over") {
+            navigation.navigate("App");
+          }
         }}
       >
         <StatusBar hidden={true} />
