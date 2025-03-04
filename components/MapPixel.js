@@ -28,6 +28,7 @@ const MapPixel = ({ body, color, width, height }) => {
         top: yPos,
         width: width,
         height: height,
+        backgroundColor: color,
       }}
     >
       {texture && (
