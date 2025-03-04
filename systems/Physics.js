@@ -12,6 +12,10 @@ const Physics = (entities, { touches, time, dispatch }) => {
   let engine = entities.physics.engine;
   let world = engine.world;
 
+  Matter.Body.setDensity(entities.player.body, 10);
+
+  Matter.Engine.update(engine, time.delta);
+
   return entities;
 };
 
