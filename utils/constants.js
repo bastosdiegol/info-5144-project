@@ -20,3 +20,15 @@ export const GAME_NAME = "Game Name";
  * @type {boolean}
  */
 export const DEBUG = true;
+
+/**
+ * Pixel size.
+ * @type {number}
+ */
+export const PIXEL_SIZE = 20;
+
+/**
+ * Player speed.
+ * @type {number}
+ */
+export const PLAYER_SPEED = 2;
