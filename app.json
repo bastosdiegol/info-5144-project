@@ -3,7 +3,7 @@
     "name": "info-5144-project",
     "slug": "info-5144-project",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,

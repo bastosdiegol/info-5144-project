@@ -9,6 +9,14 @@ import { GAME_NAME } from "../utils/constants";
  * @component HomeScreen
  */
 export default function HomeScreen({ navigation }) {
+  /**
+   * Load the game screen.
+   */
+  const handleLoadGame = () => {
+    console.log("Load Game");
+    navigation.navigate(GAME_NAME);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
@@ -16,12 +24,19 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.subtitle}>Final Project App</Text>
       </View>
       <Text style={styles.title}>{GAME_NAME}</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate(GAME_NAME)}
-      >
-        <Text style={styles.buttonText}>New Game</Text>
-      </TouchableOpacity>
+
+      <View style={styles.buttons}>
+        <TouchableOpacity
+          style={styles.buttonSave}
+          onPress={() => navigation.navigate(GAME_NAME)}
+        >
+          <Text style={styles.buttonText}>New Game</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.buttonLoad} onPress={handleLoadGame}>
+          <Text style={styles.buttonText}>Load Game</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.textContainer}>
         <Text style={styles.description}>Game developed by:</Text>
         <Text style={styles.description}>Alicja Blonski</Text>
@@ -35,10 +50,9 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    justifyContent: "center",
     alignItems: "center",
-    justifyContent: "space-between",
-    padding: 20,
+    backgroundColor: "transparent",
   },
   textContainer: {
     alignItems: "center",
@@ -57,8 +71,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
   },
-  button: {
+  buttons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
+    gap: 20,
+  },
+  buttonSave: {
     backgroundColor: "#f8268c",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  buttonLoad: {
+    backgroundColor: "grey",
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 25,

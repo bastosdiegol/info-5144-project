@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, StatusBar, View, ActivityIndicator } from "react-native";
+import { StyleSheet, View, ActivityIndicator } from "react-native";
 import { GameEngine } from "react-native-game-engine";
 import Input from "../systems/Input";
 import Physics from "../systems/Physics";
@@ -46,7 +46,7 @@ export default function GameScreen({ navigation }) {
   if (loading) {
     // Show a loading spinner while loading the assets
     return (
-      <View style={styles.loadingContainer}>
+      <View style={styles.gameContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
@@ -62,24 +62,13 @@ export default function GameScreen({ navigation }) {
           navigation.navigate("App");
         }
       }}
-    >
-      <StatusBar hidden={true} />
-    </GameEngine>
+    ></GameEngine>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFF",
-  },
   gameContainer: {
     flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: "transparent",
   },
 });
