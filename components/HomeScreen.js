@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ImageBackground,
+} from "react-native";
 import { GAME_NAME } from "../utils/constants";
 
 /**
@@ -9,6 +15,7 @@ import { GAME_NAME } from "../utils/constants";
  * @component HomeScreen
  */
 export default function HomeScreen({ navigation }) {
+  const consoleFrame = require("../assets/backgrounds/gameboy-overlay.png");
   /**
    * Load the game screen.
    */
@@ -18,51 +25,64 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.textContainer}>
-        <Text style={styles.subtitle}>Mobile Development 2</Text>
-        <Text style={styles.subtitle}>Final Project App</Text>
-      </View>
-      <Text style={styles.title}>{GAME_NAME}</Text>
+    <ImageBackground
+      source={consoleFrame}
+      style={styles.fullScreen}
+      resizeMode="cover"
+    >
+      <View style={styles.gameContainer}>
+        <View style={styles.textContainer}>
+          <Text style={styles.subtitle}>Mobile Development 2</Text>
+          <Text style={styles.subtitle}>Final Project App</Text>
+          <Text style={styles.title}>{GAME_NAME}</Text>
+        </View>
 
-      <View style={styles.buttons}>
-        <TouchableOpacity
-          style={styles.buttonSave}
-          onPress={() => navigation.navigate(GAME_NAME)}
-        >
-          <Text style={styles.buttonText}>New Game</Text>
-        </TouchableOpacity>
+        <View style={styles.buttons}>
+          <TouchableOpacity
+            style={styles.buttonSave}
+            onPress={() => navigation.navigate(GAME_NAME)}
+          >
+            <Text style={styles.buttonText}>New Game</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.buttonLoad} onPress={handleLoadGame}>
-          <Text style={styles.buttonText}>Load Game</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonLoad} onPress={handleLoadGame}>
+            <Text style={styles.buttonText}>Load Game</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.description}>Game developed by:</Text>
+          <Text style={styles.description}>Alicja Blonski</Text>
+          <Text style={styles.description}>Diego Bastos</Text>
+          <Text style={styles.description}>Katt McGuinness</Text>
+        </View>
       </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.description}>Game developed by:</Text>
-        <Text style={styles.description}>Alicja Blonski</Text>
-        <Text style={styles.description}>Diego Bastos</Text>
-        <Text style={styles.description}>Katt McGuinness</Text>
-      </View>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  fullScreen: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "transparent",
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+  },
+  gameContainer: {
+    position: "absolute",
+    width: "50%",
+    height: "80%",
+    left: "25%",
+    top: "10%",
   },
   textContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 20,
+    marginVertical: 10,
   },
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginVertical: 10,
   },
   subtitle: {
     fontSize: 18,
@@ -76,6 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     gap: 20,
+    marginVertical: 10,
   },
   buttonSave: {
     backgroundColor: "#f8268c",
