@@ -32,7 +32,10 @@ const MapPixel = ({ body, color, width, height }) => {
       }}
     >
       {texture && (
-        <Image source={texture} style={{ width: width, height: height }} />
+        <Image
+          source={texture}
+          style={{ width: width, height: height, resizeMode: "repeat" }}
+        />
       )}
     </View>
   );
