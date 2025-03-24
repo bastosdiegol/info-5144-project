@@ -108,4 +108,62 @@ const styles = StyleSheet.create({
   },
 });
 
+/*
+ * Handle button press events.
+ */
+
+const handlePressUp = (gameEngine) => {
+  console.log("Up Button Pressed");
+};
+
+const handlePressDown = (gameEngine) => {
+  console.log("Down Button Pressed");
+};
+
+const handlePressLeft = (gameEngine) => {
+  console.log("Left Button Pressed");
+  if (gameEngine.current) {
+    gameEngine.current.dispatch({ type: "left" });
+  }
+};
+
+const handlePressRight = (gameEngine) => {
+  console.log("Right Button Pressed");
+  if (gameEngine.current) {
+    gameEngine.current.dispatch({ type: "right" });
+  }
+};
+
+const handlePressA = (gameEngine) => {
+  console.log("A Button Pressed");
+  if (gameEngine.current) {
+    gameEngine.current.dispatch({ type: "special" });
+  }
+};
+
+const handlePressB = (gameEngine) => {
+  console.log("B Button Pressed");
+  if (gameEngine.current) {
+    gameEngine.current.dispatch({ type: "jump" });
+  }
+};
+
+const handlePressStart = (navigation) => {
+  navigation.navigate("Home");
+};
+
+const handlePressSelect = (gameEngine) => {
+  console.log("Select Button Pressed");
+};
+
 export default InputControls;
+export {
+  handlePressUp,
+  handlePressDown,
+  handlePressLeft,
+  handlePressRight,
+  handlePressA,
+  handlePressB,
+  handlePressStart,
+  handlePressSelect,
+};

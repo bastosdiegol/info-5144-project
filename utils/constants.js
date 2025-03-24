@@ -31,4 +31,23 @@ export const PIXEL_SIZE = 20;
  * Player speed.
  * @type {number}
  */
-export const PLAYER_SPEED = 2;
+export const PLAYER_SPEED = 3;
+
+/**
+ * Player jump force.
+ * @type {number}
+ */
+export const PLAYER_JUMP_FORCE = -12;
+
+/**
+ * Sprite sheets.
+ * @type {object}
+ */
+export const SPRITESHEETS = {
+  ash: {
+    sprite: require("../assets/spritesheets/ash_walk_anim.png"),
+  },
+  pikachu: {
+    sprite: require("../assets/spritesheets/pikachu_anim.png"),
+  },
+};

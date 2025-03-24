@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -11,7 +11,16 @@ import Physics from "../systems/Physics";
 import entities from "../entities";
 import parseBMPImage from "../utils/parseBMPImage";
 import { Asset } from "expo-asset";
-import InputControls from "./InputControls";
+import InputControls, {
+  handlePressA,
+  handlePressB,
+  handlePressStart,
+  handlePressSelect,
+  handlePressUp,
+  handlePressDown,
+  handlePressLeft,
+  handlePressRight,
+} from "./InputControls";
 
 /**
  * Load the map by passing the BMP file path
@@ -31,19 +40,9 @@ export default function GameScreen({ navigation }) {
   const [imageUri, setImageUri] = useState(null);
   const [pixelData, setPixelData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const gameEngine = useRef(null);
 
   const consoleFrame = require("../assets/backgrounds/gameboy-overlay.png");
-
-  const handlePressUp = () => console.log("Up Button Pressed");
-  const handlePressDown = () => console.log("Down Button Pressed");
-  const handlePressLeft = () => console.log("Left Button Pressed");
-  const handlePressRight = () => console.log("Right Button Pressed");
-  const handlePressA = () => console.log("A Button Pressed");
-  const handlePressB = () => console.log("B Button Pressed");
-  const handlePressStart = () => {
-    navigation.navigate("Home");
-  };
-  const handlePressSelect = () => console.log("Select Button Pressed");
 
   useEffect(() => {
     // Load the first BMP asset
@@ -77,26 +76,35 @@ export default function GameScreen({ navigation }) {
       style={styles.fullScreen}
       resizeMode="cover"
     >
-      <GameEngine
-        style={styles.gameContainer}
-        systems={[Input, Physics]}
-        entities={entities(pixelData)}
-        onEvent={(e) => {
-          if (e.type === "game-over") {
-            navigation.navigate("Home");
-          }
-        }}
-      ></GameEngine>
+      <View style={styles.gameContainer}>
+        <ImageBackground
+          source={require("../assets/backgrounds/forest.jpg")}
+          style={styles.fullScreen}
+          resizeMode="cover"
+        >
+          <GameEngine
+            ref={gameEngine}
+            systems={[Input, Physics]}
+            entities={entities(pixelData)}
+            onEvent={(e) => {
+              if (e.type === "game-over") {
+                navigation.navigate("Home");
+              }
+            }}
+            style={styles.fullScreen}
+          ></GameEngine>
+        </ImageBackground>
+      </View>
 
       <InputControls
-        onPressUp={handlePressUp}
-        onPressDown={handlePressDown}
-        onPressLeft={handlePressLeft}
-        onPressRight={handlePressRight}
-        onPressA={handlePressA}
-        onPressB={handlePressB}
-        onPressStart={handlePressStart}
-        onPressSelect={handlePressSelect}
+        onPressUp={() => handlePressUp(gameEngine)}
+        onPressDown={() => handlePressDown(gameEngine)}
+        onPressLeft={() => handlePressLeft(gameEngine)}
+        onPressRight={() => handlePressRight(gameEngine)}
+        onPressA={() => handlePressA(gameEngine)}
+        onPressB={() => handlePressB(gameEngine)}
+        onPressStart={() => handlePressStart(navigation)}
+        onPressSelect={() => handlePressSelect(gameEngine)}
       />
     </ImageBackground>
   );
@@ -108,6 +116,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     position: "absolute",
+    overflow: "hidden",
   },
   gameContainer: {
     position: "absolute",
