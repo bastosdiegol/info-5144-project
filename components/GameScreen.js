@@ -33,8 +33,11 @@ export default function GameScreen({ navigation }) {
       const timer = setInterval(() => {
         setGameTime((prevTime) => prevTime - 1);
       }, 1000);
+
       return () => clearInterval(timer);
-    } else {
+    }
+
+    if (gameTime === 0) {
       setIsGameOver(true);
       setRunning(false);
     }
@@ -46,7 +49,10 @@ export default function GameScreen({ navigation }) {
     setPlayerTwoScore(0);
     setGameTime(MAX_GAME_TIME);
     setIsGameOver(false);
-    setRunning(true);
+
+    setTimeout(() => {
+      setRunning(true);
+    }, 100);
   };
 
   const endGameMessage = () => {
@@ -103,11 +109,13 @@ export default function GameScreen({ navigation }) {
         {isGameOver && endGameMessage()}
 
         {/* Game Engine with Physics and Input Systems */}
-        <GameEngine
-          systems={[Physics, Input]}
-          entities={entities()}
-          running={running}
-        ></GameEngine>
+        {!isGameOver && (
+          <GameEngine
+            systems={[Physics, Input]}
+            entities={entities()}
+            running={running}
+          ></GameEngine>
+        )}
       </ImageBackground>
 
       {/* Bottom Info */}
@@ -148,6 +156,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     marginTop: 10,
+    zIndex: 3,
   },
   buttonText: {
     color: "#fff",

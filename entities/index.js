@@ -1,6 +1,7 @@
 import Matter from "matter-js";
 import { WINDOW_WIDTH, WINDOW_HEIGHT, BOUNDARY_SIZE } from "../utils/constants";
 import Boundary from "../components/Boundary";
+import Puck from "../components/Puck";
 
 export default () => {
   let engine = Matter.Engine.create({ enableSleeping: false });
@@ -10,6 +11,17 @@ export default () => {
 
   return {
     physics: { engine, world },
+
+    Puck: Puck(
+      world,
+      "blue",
+      { x: WINDOW_WIDTH / 2, y: WINDOW_HEIGHT / 2.05 },
+      20,
+      {
+        restitution: 0.9,
+        label: "Puck",
+      }
+    ),
 
     BoundaryTop: Boundary(
       world,
