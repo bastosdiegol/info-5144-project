@@ -1,5 +1,5 @@
 import Matter from "matter-js";
-import { MAX_VELOCITY } from "../utils/constants";
+import { MAX_VELOCITY, WINDOW_WIDTH, WINDOW_HEIGHT } from "../utils/constants";
 
 /**
  * Physics System
@@ -44,22 +44,63 @@ const Physics = (entities, { touches, time, dispatch }) => {
   }
   Matter.Engine.update(engine, time.delta);
 
-  // Handle Collision Events With Puck and Boundaries
   Matter.Events.on(engine, "collisionStart", (event) => {
+    if (!event.pairs || event.pairs.length === 0) return;
     let pairs = event.pairs;
     let objA = pairs[0].bodyA;
     let objB = pairs[0].bodyB;
+    if (!objA || !objB) return;
     let objALabel = objA.label;
     let objBLabel = objB.label;
+    let isGoal = false;
 
-    if (objALabel === "Puck" && objBLabel === "BoundaryTop") {
+    // Handle Collision Events with Puck and Nets - Goal Detection
+    if (objALabel === "Puck" && objBLabel === "GoalNetTop") {
+      dispatch({ type: "GOAL_TEAM_ONE" });
+      // Reset the puck position close to player 2's goal
+      Matter.Body.setPosition(objA, {
+        x: WINDOW_WIDTH * 0.5,
+        y: WINDOW_HEIGHT * 0.25,
+      });
+      isGoal = true;
+      // Set the Score Animation
+      entities.ConfettiScorePlayerOne.animOptions.animType = "score";
+      console.log("Goal Team One!");
+    }
+    if (objALabel === "Puck" && objBLabel === "GoalNetBottom") {
+      dispatch({ type: "GOAL_TEAM_TWO" });
+      // Reset the puck position close to player 1's goal
+      Matter.Body.setPosition(objA, {
+        x: WINDOW_WIDTH * 0.5,
+        y: WINDOW_HEIGHT * 0.75,
+      });
+      isGoal = true;
+      // Set the Score Animation
+      entities.ConfettiScorePlayerTwo.animOptions.animType = "score";
+    }
+    if (isGoal) {
+      // Stop the puck and update the engine
+      Matter.Body.setVelocity(objA, { x: 0, y: 0 });
+      Matter.Body.setAngularVelocity(objA, 0);
+      Matter.Engine.update(engine, time.delta);
+    }
+
+    // Handle Collision Events With Puck and Boundaries
+    if (
+      objALabel === "Puck" &&
+      (objBLabel === "BoundaryTopLeft" || objBLabel === "BoundaryTopRight")
+    ) {
       // Reflect the puck off the top boundary
       Matter.Body.setVelocity(objA, {
         x: objA.velocity.x,
         y: -objA.velocity.y,
       });
     }
-    if (objALabel === "Puck" && objBLabel === "BoundaryBottom") {
+    if (
+      objALabel === "Puck" &&
+      (objBLabel === "BoundaryBottomLeft" ||
+        objBLabel === "BoundaryBottomRight")
+    ) {
       // Reflect the puck off the bottom boundary
       Matter.Body.setVelocity(objA, {
         x: objA.velocity.x,

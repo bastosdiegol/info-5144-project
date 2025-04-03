@@ -17,7 +17,7 @@ const Boundary = (props) => {
         top: yPos,
         width: width,
         height: height,
-        // backgroundColor: props.color,
+        backgroundColor: props.color,
       }}
     />
   );

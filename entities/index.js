@@ -2,12 +2,19 @@ import Matter from "matter-js";
 import { WINDOW_WIDTH, WINDOW_HEIGHT, BOUNDARY_SIZE } from "../utils/constants";
 import Boundary from "../components/Boundary";
 import Puck from "../components/Puck";
+import ConfettiScore from "../components/ConfettiScore";
 
 export default () => {
   let engine = Matter.Engine.create({ enableSleeping: false });
   engine.gravity.y = 0;
 
   let world = engine.world;
+
+  const GOAL_WIDTH = WINDOW_WIDTH * 0.25;
+  const HALF_GOAL = GOAL_WIDTH / 2;
+  const BOUNDARY_Y_TOP = WINDOW_HEIGHT - WINDOW_HEIGHT / 1.08;
+  const BOUNDARY_Y_BOTTOM = WINDOW_HEIGHT / 1.11;
+  const NET_OFFSET = 50;
 
   return {
     physics: { engine, world },
@@ -23,20 +30,80 @@ export default () => {
       }
     ),
 
-    BoundaryTop: Boundary(
+    GoalNetTop: Boundary(
       world,
-      "orange",
-      { x: WINDOW_WIDTH * 0.5, y: WINDOW_HEIGHT - WINDOW_HEIGHT / 1.08 },
-      { width: WINDOW_WIDTH, height: BOUNDARY_SIZE },
-      { label: "BoundaryTop" }
+      "transparent",
+      { x: WINDOW_WIDTH / 2, y: BOUNDARY_Y_TOP - NET_OFFSET },
+      { width: GOAL_WIDTH, height: BOUNDARY_SIZE / 2 },
+      { isStatic: true, label: "GoalNetTop" }
     ),
 
-    BoundaryBottom: Boundary(
+    GoalNetBottom: Boundary(
+      world,
+      "transparent",
+      { x: WINDOW_WIDTH / 2, y: BOUNDARY_Y_BOTTOM + NET_OFFSET },
+      { width: GOAL_WIDTH, height: BOUNDARY_SIZE / 2 },
+      { isStatic: true, label: "GoalNetBottom" }
+    ),
+
+    ConfettiScorePlayerOne: ConfettiScore(
+      world,
+      "transparent",
+      { x: WINDOW_WIDTH * 0.5, y: WINDOW_HEIGHT * 0.7 },
+      { width: WINDOW_WIDTH, height: WINDOW_HEIGHT * 0.5 },
+      { animType: "idle" }
+    ),
+
+    ConfettiScorePlayerTwo: ConfettiScore(
+      world,
+      "transparent",
+      { x: WINDOW_WIDTH * 0.5, y: WINDOW_HEIGHT * 0.3 },
+      { width: WINDOW_WIDTH, height: WINDOW_HEIGHT * 0.5 },
+      { animType: "idle" }
+    ),
+
+    BoundaryTopLeft: Boundary(
       world,
       "orange",
-      { x: WINDOW_WIDTH * 0.5, y: WINDOW_HEIGHT / 1.11 },
-      { width: WINDOW_WIDTH, height: BOUNDARY_SIZE },
-      { isStatic: true, label: "BoundaryBottom" }
+      {
+        x: WINDOW_WIDTH / 2 - (HALF_GOAL + (WINDOW_WIDTH - GOAL_WIDTH) / 4),
+        y: BOUNDARY_Y_TOP,
+      },
+      { width: (WINDOW_WIDTH - GOAL_WIDTH) / 2, height: BOUNDARY_SIZE },
+      { isStatic: true, label: "BoundaryTopLeft" }
+    ),
+
+    BoundaryTopRight: Boundary(
+      world,
+      "orange",
+      {
+        x: WINDOW_WIDTH / 2 + (HALF_GOAL + (WINDOW_WIDTH - GOAL_WIDTH) / 4),
+        y: BOUNDARY_Y_TOP,
+      },
+      { width: (WINDOW_WIDTH - GOAL_WIDTH) / 2, height: BOUNDARY_SIZE },
+      { isStatic: true, label: "BoundaryTopRight" }
+    ),
+
+    BoundaryBottomLeft: Boundary(
+      world,
+      "orange",
+      {
+        x: WINDOW_WIDTH / 2 - (HALF_GOAL + (WINDOW_WIDTH - GOAL_WIDTH) / 4),
+        y: BOUNDARY_Y_BOTTOM,
+      },
+      { width: (WINDOW_WIDTH - GOAL_WIDTH) / 2, height: BOUNDARY_SIZE },
+      { isStatic: true, label: "BoundaryBottomLeft" }
+    ),
+
+    BoundaryBottomRight: Boundary(
+      world,
+      "orange",
+      {
+        x: WINDOW_WIDTH / 2 + (HALF_GOAL + (WINDOW_WIDTH - GOAL_WIDTH) / 4),
+        y: BOUNDARY_Y_BOTTOM,
+      },
+      { width: (WINDOW_WIDTH - GOAL_WIDTH) / 2, height: BOUNDARY_SIZE },
+      { isStatic: true, label: "BoundaryBottomRight" }
     ),
 
     BoundaryLeft: Boundary(

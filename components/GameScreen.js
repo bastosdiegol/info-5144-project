@@ -114,6 +114,14 @@ export default function GameScreen({ navigation }) {
             systems={[Physics, Input]}
             entities={entities()}
             running={running}
+            onEvent={(e) => {
+              if (e.type === "GOAL_TEAM_ONE") {
+                setPlayerOneScore(playerOneScore + 1);
+              }
+              if (e.type === "GOAL_TEAM_TWO") {
+                setPlayerTwoScore(playerTwoScore + 1);
+              }
+            }}
           ></GameEngine>
         )}
       </ImageBackground>
