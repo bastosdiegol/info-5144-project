@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { MAX_GAME_TIME, GAME_BOARD_IMG } from "../utils/constants";
+import { GameEngine } from "react-native-game-engine";
+import Physics from "../systems/Physics";
+import Input from "../systems/Input";
+import entities from "../entities/index";
 
 /**
  * GameScreen component
@@ -17,6 +21,7 @@ import { MAX_GAME_TIME, GAME_BOARD_IMG } from "../utils/constants";
  * @returns {JSX.Element} - The rendered component.
  */
 export default function GameScreen({ navigation }) {
+  const [running, setRunning] = useState(true);
   const [playerOneScore, setPlayerOneScore] = useState(0);
   const [playerTwoScore, setPlayerTwoScore] = useState(0);
   const [gameTime, setGameTime] = useState(MAX_GAME_TIME);
@@ -31,6 +36,7 @@ export default function GameScreen({ navigation }) {
       return () => clearInterval(timer);
     } else {
       setIsGameOver(true);
+      setRunning(false);
     }
   }, [gameTime, isGameOver]);
 
@@ -40,6 +46,7 @@ export default function GameScreen({ navigation }) {
     setPlayerTwoScore(0);
     setGameTime(MAX_GAME_TIME);
     setIsGameOver(false);
+    setRunning(true);
   };
 
   const endGameMessage = () => {
@@ -94,6 +101,13 @@ export default function GameScreen({ navigation }) {
       <ImageBackground source={GAME_BOARD_IMG} style={styles.imageBackground}>
         {/* Game Over Message */}
         {isGameOver && endGameMessage()}
+
+        {/* Game Engine with Physics and Input Systems */}
+        <GameEngine
+          systems={[Physics, Input]}
+          entities={entities()}
+          running={running}
+        ></GameEngine>
       </ImageBackground>
 
       {/* Bottom Info */}
@@ -110,14 +124,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   imageBackground: {
-    flex: 1,
+    display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    flex: 1,
   },
   info: {
     position: "absolute",
     width: "100%",
     height: "28%",
+    alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
