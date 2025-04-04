@@ -14,6 +14,14 @@ import Puck from "../components/Puck";
 import ConfettiScore from "../components/ConfettiScore";
 import Paddle from "../components/Paddle";
 
+/**
+ * Entities function for the game.
+ * This function creates and returns the game entities using Matter.js.
+ * It initializes the physics engine, creates the puck, paddles,
+ * goal nets, and boundaries.
+ *
+ * @returns {object} - The game entities.
+ */
 export default () => {
   let engine = Matter.Engine.create({ enableSleeping: false });
   engine.gravity.y = 0;

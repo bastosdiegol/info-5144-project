@@ -11,6 +11,7 @@ import { GameEngine } from "react-native-game-engine";
 import Physics from "../systems/Physics";
 import Input from "../systems/Input";
 import Boundary from "../systems/Boundary";
+import AIPaddle from "../systems/AIPaddle";
 import entities from "../entities/index";
 
 /**
@@ -21,12 +22,14 @@ import entities from "../entities/index";
  * @param {object} navigation - Navigation prop to navigate between screens.
  * @returns {JSX.Element} - The rendered component.
  */
-export default function GameScreen({ navigation }) {
+export default function GameScreen({ navigation, route }) {
   const [running, setRunning] = useState(true);
   const [playerOneScore, setPlayerOneScore] = useState(0);
   const [playerTwoScore, setPlayerTwoScore] = useState(0);
   const [gameTime, setGameTime] = useState(MAX_GAME_TIME);
   const [isGameOver, setIsGameOver] = useState(false);
+
+  const aiDifficulty = route.params?.aiDifficulty || 3;
 
   // Countdown Timer Effect
   useEffect(() => {
@@ -94,7 +97,7 @@ export default function GameScreen({ navigation }) {
       <View style={styles.topInfo}>
         {/* Team Red AI and Score on one line */}
         <View style={styles.teamInfo}>
-          <Text style={styles.teamTextRed}>Team Red: Player Two</Text>
+          <Text style={styles.teamTextRed}>Team Red: AI</Text>
           <Text style={styles.scoreTextRed}>Score: {playerTwoScore}</Text>
         </View>
 
@@ -112,7 +115,13 @@ export default function GameScreen({ navigation }) {
         {/* Game Engine with Physics and Input Systems */}
         {!isGameOver && (
           <GameEngine
-            systems={[Physics, Input, Boundary]}
+            systems={[
+              Physics,
+              Input,
+              Boundary,
+              (entities, { time }) =>
+                AIPaddle(entities, { time, aiDifficulty }),
+            ]}
             entities={entities()}
             running={running}
             onEvent={(e) => {
@@ -129,7 +138,7 @@ export default function GameScreen({ navigation }) {
 
       {/* Bottom Info */}
       <View style={styles.bottomInfo}>
-        <Text style={styles.teamTextBlue}>Team Blue: Player One</Text>
+        <Text style={styles.teamTextBlue}>Team Blue: Player</Text>
         <Text style={styles.scoreTextBlue}>Score: {playerOneScore}</Text>
       </View>
     </View>
@@ -192,7 +201,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   teamInfo: {
-    paddingTop: 15,
+    paddingTop: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",

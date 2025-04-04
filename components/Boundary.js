@@ -2,6 +2,14 @@ import Matter from "matter-js";
 import React from "react";
 import { View } from "react-native";
 
+/**
+ * Boundary Component
+ * Renders a boundary rectangle in the game.
+ *
+ * @component
+ * @param {object} props - The properties passed to the component.
+ * @return {JSX.Element} - The rendered component.
+ */
 const Boundary = (props) => {
   const width = props.body.bounds.max.x - props.body.bounds.min.x;
   const height = props.body.bounds.max.y - props.body.bounds.min.y;

@@ -21,7 +21,7 @@ export const PADDLE_SIZE = 30;
 /** Puck Size */
 export const PUCK_SIZE = 20;
 /** Puck and Paddle Max Velocity */
-export const MAX_VELOCITY = 5;
+export const MAX_VELOCITY = 10;
 /** Paddle Max Allowed Distance */
 export const PADDLE_MAX_DISTANCE = 200;
 /** Paddle Player One Initial Location */

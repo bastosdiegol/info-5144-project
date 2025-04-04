@@ -14,16 +14,18 @@ import { MAX_VELOCITY, WINDOW_WIDTH, WINDOW_HEIGHT } from "../utils/constants";
  */
 const Physics = (entities, { touches, time, dispatch }) => {
   let engine = entities.physics.engine;
-
-  // Ensure velocity is clamped every frame
   let puck = entities.Puck?.body;
   if (puck) {
+    // Remove Air Friction from Puck
+    Matter.Body.set(puck, { frictionAir: 0 });
+    // Clamp the puck's velocity to a maximum value
     let clampedVelocity = clampVelocity(puck.velocity, MAX_VELOCITY);
     Matter.Body.setVelocity(puck, clampedVelocity);
   }
   Matter.Engine.update(engine, time.delta);
 
   Matter.Events.on(engine, "collisionStart", (event) => {
+    // Check if there are any collision pairs
     if (!event.pairs || event.pairs.length === 0) return;
     let pairs = event.pairs;
     let objA = pairs[0].bodyA;
@@ -33,47 +35,35 @@ const Physics = (entities, { touches, time, dispatch }) => {
     let objBLabel = objB.label;
     let isGoal = false;
 
-    // Handle Collision Events with Paddles and Puck
+    // Cooldown for paddle hit detection
     let lastPaddleHitTime = 0;
     const PADDLE_HIT_COOLDOWN = 100;
+    const currentTime = Date.now();
 
-    Matter.Events.on(engine, "collisionStart", (event) => {
-      const currentTime = Date.now();
+    // *** Handle Paddle & Puck Collision ***
+    if (
+      (objALabel.includes("Paddle") && objBLabel === "Puck") ||
+      (objBLabel.includes("Paddle") && objALabel === "Puck")
+    ) {
+      if (currentTime - lastPaddleHitTime > PADDLE_HIT_COOLDOWN) {
+        lastPaddleHitTime = currentTime;
 
-      if (!event.pairs || event.pairs.length === 0) return;
+        const paddle = objALabel.includes("Paddle") ? objA : objB;
+        const puck = objALabel === "Puck" ? objA : objB;
 
-      for (let pair of event.pairs) {
-        let objA = pair.bodyA;
-        let objB = pair.bodyB;
+        let normal = Matter.Vector.normalise({
+          x: puck.position.x - paddle.position.x,
+          y: puck.position.y - paddle.position.y,
+        });
 
-        if (!objA || !objB) continue;
-        let objALabel = objA.label;
-        let objBLabel = objB.label;
+        const newPuckVelocity = Matter.Vector.mult(normal, MAX_VELOCITY * 2);
 
-        // Handle Paddle & Puck Collision
-        if (
-          (objALabel.includes("Paddle") && objBLabel === "Puck") ||
-          (objBLabel.includes("Paddle") && objALabel === "Puck")
-        ) {
-          if (currentTime - lastPaddleHitTime < PADDLE_HIT_COOLDOWN) continue;
-          lastPaddleHitTime = currentTime;
-
-          const paddle = objALabel.includes("Paddle") ? objA : objB;
-          const puck = objALabel === "Puck" ? objA : objB;
-
-          let normal = Matter.Vector.normalise({
-            x: puck.position.x - paddle.position.x,
-            y: puck.position.y - paddle.position.y,
-          });
-
-          const newPuckVelocity = Matter.Vector.mult(normal, MAX_VELOCITY);
-          Matter.Body.setVelocity(puck, newPuckVelocity);
-        }
+        Matter.Body.setVelocity(puck, newPuckVelocity);
       }
-    });
+    }
     Matter.Engine.update(engine, time.delta);
 
-    // Handle Collision Events with Puck and Nets - Goal Detection
+    // *** Handle Collision Events with Puck and Nets - Goal Detection **
     if (objALabel === "Puck" && objBLabel === "GoalNetTop") {
       dispatch({ type: "GOAL_TEAM_ONE" });
       // Reset the puck position close to player 2's goal
@@ -84,7 +74,6 @@ const Physics = (entities, { touches, time, dispatch }) => {
       isGoal = true;
       // Set the Score Animation
       entities.ConfettiScorePlayerOne.animOptions.animType = "score";
-      console.log("Goal Team One!");
     }
     if (objALabel === "Puck" && objBLabel === "GoalNetBottom") {
       dispatch({ type: "GOAL_TEAM_TWO" });
@@ -103,7 +92,7 @@ const Physics = (entities, { touches, time, dispatch }) => {
       Matter.Engine.update(engine, time.delta);
     }
 
-    // Handle Collision Events With Puck and Boundaries
+    // *** Handle Collision Events With Puck and Boundaries ***
     if (
       objALabel === "Puck" &&
       (objBLabel === "BoundaryTopLeft" || objBLabel === "BoundaryTopRight")

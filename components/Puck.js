@@ -2,6 +2,14 @@ import { Image } from "react-native";
 import Matter from "matter-js";
 import { PUCK_IMG } from "../utils/constants";
 
+/**
+ * Puck Component
+ * Renders a puck circle in the game.
+ *
+ * @component
+ * @param {object} props - The properties passed to the component.
+ * @return {JSX.Element} - The rendered component.
+ */
 const Puck = (props) => {
   const width = props.radius * 2;
 
@@ -34,6 +42,8 @@ export default (world, color, pos, radius, extraOptions, running) => {
     mass: 0.5,
     friction: 0,
     frictionStatic: 0,
+    frictionAir: 0,
+    inertia: Infinity,
     isStatic: false,
   });
   // Set random initial velocity after the puck is created

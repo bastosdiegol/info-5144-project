@@ -3,6 +3,14 @@ import React, { useEffect, useState, useRef } from "react";
 import { View } from "react-native";
 import SpriteSheet from "rn-sprite-sheet";
 
+/**
+ * ConfettiScore Component
+ * Renders a confetti animation on the screen.
+ *
+ * @component
+ * @param {object} props - The properties passed to the component.
+ * @return {JSX.Element} - The rendered component.
+ */
 const ConfettiScore = (props) => {
   const confettiRef = useRef(null);
 

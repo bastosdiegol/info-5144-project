@@ -20,11 +20,17 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "resizeMode": "contain",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.bastosdiegol.finalproject"
     },
     "web": {
       "favicon": "./assets/adaptive-icon.png",
       "resizeMode": "contain"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c8562923-86ca-4cd3-bace-1422771617d8"
+      }
     }
   }
 }

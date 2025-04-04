@@ -6,6 +6,14 @@ import {
   PADDLE_MAX_DISTANCE,
 } from "../utils/constants";
 
+/**
+ * Paddle Component
+ * Renders a paddle circle in the game.
+ *
+ * @component
+ * @param {object} props - The properties passed to the component.
+ * @return {JSX.Element} - The rendered component.
+ */
 const Paddle = (props) => {
   const width = props.radius * 2;
 
