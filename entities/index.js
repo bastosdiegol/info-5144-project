@@ -1,8 +1,18 @@
 import Matter from "matter-js";
-import { WINDOW_WIDTH, WINDOW_HEIGHT, BOUNDARY_SIZE } from "../utils/constants";
+import {
+  WINDOW_WIDTH,
+  WINDOW_HEIGHT,
+  BOUNDARY_SIZE,
+  PADDLE_SIZE,
+  PUCK_SIZE,
+  PADDLE_ONE_START,
+  PADDLE_TWO_START,
+  PUCK_CENTER_START,
+} from "../utils/constants";
 import Boundary from "../components/Boundary";
 import Puck from "../components/Puck";
 import ConfettiScore from "../components/ConfettiScore";
+import Paddle from "../components/Paddle";
 
 export default () => {
   let engine = Matter.Engine.create({ enableSleeping: false });
@@ -10,7 +20,7 @@ export default () => {
 
   let world = engine.world;
 
-  const GOAL_WIDTH = WINDOW_WIDTH * 0.25;
+  const GOAL_WIDTH = WINDOW_WIDTH * 0.3;
   const HALF_GOAL = GOAL_WIDTH / 2;
   const BOUNDARY_Y_TOP = WINDOW_HEIGHT - WINDOW_HEIGHT / 1.08;
   const BOUNDARY_Y_BOTTOM = WINDOW_HEIGHT / 1.11;
@@ -19,16 +29,20 @@ export default () => {
   return {
     physics: { engine, world },
 
-    Puck: Puck(
-      world,
-      "blue",
-      { x: WINDOW_WIDTH / 2, y: WINDOW_HEIGHT / 2.05 },
-      20,
-      {
-        restitution: 0.9,
-        label: "Puck",
-      }
-    ),
+    Puck: Puck(world, "blue", PUCK_CENTER_START, PUCK_SIZE, {
+      restitution: 0.9,
+      label: "Puck",
+    }),
+
+    PaddlePlayerOne: Paddle(world, "blue", PADDLE_ONE_START, PADDLE_SIZE, {
+      restitution: 0.9,
+      label: "PaddlePlayerOne",
+    }),
+
+    PaddlePlayerTwo: Paddle(world, "red", PADDLE_TWO_START, PADDLE_SIZE, {
+      restitution: 0.9,
+      label: "PaddlePlayerTwo",
+    }),
 
     GoalNetTop: Boundary(
       world,

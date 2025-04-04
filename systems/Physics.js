@@ -15,27 +15,6 @@ import { MAX_VELOCITY, WINDOW_WIDTH, WINDOW_HEIGHT } from "../utils/constants";
 const Physics = (entities, { touches, time, dispatch }) => {
   let engine = entities.physics.engine;
 
-  // Apply Velocity to Puck on Swipe
-  touches.forEach((t) => {
-    if (t.type === "start") {
-      entities.touchStart = { x: t.event.pageX, y: t.event.pageY };
-    } else if (t.type === "move") {
-      if (!entities.touchStart) return;
-
-      let puck = entities.Puck?.body;
-      if (!puck) {
-        console.error("Puck or its body is missing!", entities.Puck);
-        return;
-      }
-
-      let rawVelocity = {
-        x: (t.event.pageX - entities.touchStart.x) * 0.1,
-        y: (t.event.pageY - entities.touchStart.y) * 0.1,
-      };
-
-      Matter.Body.setVelocity(puck, rawVelocity);
-    }
-  });
   // Ensure velocity is clamped every frame
   let puck = entities.Puck?.body;
   if (puck) {
@@ -53,6 +32,46 @@ const Physics = (entities, { touches, time, dispatch }) => {
     let objALabel = objA.label;
     let objBLabel = objB.label;
     let isGoal = false;
+
+    // Handle Collision Events with Paddles and Puck
+    let lastPaddleHitTime = 0;
+    const PADDLE_HIT_COOLDOWN = 100;
+
+    Matter.Events.on(engine, "collisionStart", (event) => {
+      const currentTime = Date.now();
+
+      if (!event.pairs || event.pairs.length === 0) return;
+
+      for (let pair of event.pairs) {
+        let objA = pair.bodyA;
+        let objB = pair.bodyB;
+
+        if (!objA || !objB) continue;
+        let objALabel = objA.label;
+        let objBLabel = objB.label;
+
+        // Handle Paddle & Puck Collision
+        if (
+          (objALabel.includes("Paddle") && objBLabel === "Puck") ||
+          (objBLabel.includes("Paddle") && objALabel === "Puck")
+        ) {
+          if (currentTime - lastPaddleHitTime < PADDLE_HIT_COOLDOWN) continue;
+          lastPaddleHitTime = currentTime;
+
+          const paddle = objALabel.includes("Paddle") ? objA : objB;
+          const puck = objALabel === "Puck" ? objA : objB;
+
+          let normal = Matter.Vector.normalise({
+            x: puck.position.x - paddle.position.x,
+            y: puck.position.y - paddle.position.y,
+          });
+
+          const newPuckVelocity = Matter.Vector.mult(normal, MAX_VELOCITY);
+          Matter.Body.setVelocity(puck, newPuckVelocity);
+        }
+      }
+    });
+    Matter.Engine.update(engine, time.delta);
 
     // Handle Collision Events with Puck and Nets - Goal Detection
     if (objALabel === "Puck" && objBLabel === "GoalNetTop") {
@@ -81,7 +100,6 @@ const Physics = (entities, { touches, time, dispatch }) => {
     if (isGoal) {
       // Stop the puck and update the engine
       Matter.Body.setVelocity(objA, { x: 0, y: 0 });
-      Matter.Body.setAngularVelocity(objA, 0);
       Matter.Engine.update(engine, time.delta);
     }
 

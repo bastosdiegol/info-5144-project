@@ -10,6 +10,7 @@ import { MAX_GAME_TIME, GAME_BOARD_IMG } from "../utils/constants";
 import { GameEngine } from "react-native-game-engine";
 import Physics from "../systems/Physics";
 import Input from "../systems/Input";
+import Boundary from "../systems/Boundary";
 import entities from "../entities/index";
 
 /**
@@ -111,7 +112,7 @@ export default function GameScreen({ navigation }) {
         {/* Game Engine with Physics and Input Systems */}
         {!isGameOver && (
           <GameEngine
-            systems={[Physics, Input]}
+            systems={[Physics, Input, Boundary]}
             entities={entities()}
             running={running}
             onEvent={(e) => {
