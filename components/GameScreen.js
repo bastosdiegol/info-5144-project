@@ -10,7 +10,7 @@ import { MAX_GAME_TIME, GAME_BOARD_IMG } from "../utils/constants";
 import { GameEngine } from "react-native-game-engine";
 import Physics from "../systems/Physics";
 import Input from "../systems/Input";
-import Boundary from "../systems/Boundary";
+import BoundaryCheck from "../systems/BoundaryCheck";
 import AIPaddle from "../systems/AIPaddle";
 import entities from "../entities/index";
 
@@ -118,7 +118,7 @@ export default function GameScreen({ navigation, route }) {
             systems={[
               Physics,
               Input,
-              Boundary,
+              BoundaryCheck,
               (entities, { time }) =>
                 AIPaddle(entities, { time, aiDifficulty }),
             ]}

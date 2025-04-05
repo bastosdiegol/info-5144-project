@@ -7,7 +7,7 @@ import {
 } from "../utils/constants";
 
 /**
- * GameResetSystem is a Matter.js system that resets the position of the puck and paddles
+ * BoundaryCheck is a Matter.js system that resets the position of the puck and paddles
  * if they go out of bounds. It checks the position of each entity and resets them to their
  * initial positions if they are outside the screen boundaries.
  *
@@ -16,7 +16,7 @@ import {
  * @param {object} time - The time object.
  * @return {object} - The updated entities.
  */
-const GameResetSystem = (entities, { time }) => {
+const BoundaryCheck = (entities, { time }) => {
   const puck = entities.Puck.body;
   const paddleOne = entities.PaddlePlayerOne.body;
   const paddleTwo = entities.PaddlePlayerTwo.body;
@@ -79,4 +79,4 @@ const resetBody = (body, position) => {
   Matter.Body.setAngularVelocity(body, 0);
 };
 
-export default GameResetSystem;
+export default BoundaryCheck;
