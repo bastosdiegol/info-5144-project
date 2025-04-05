@@ -42,7 +42,10 @@ export default function WelcomeScreen({ navigation }) {
           <Text style={styles.textRed}>AI opponent</Text>'s net!
         </Text>
         <Text>
-          Developed by: <Text style={styles.textBold}>Diego Bastos</Text>
+          Developed by:{" "}
+          <Text style={styles.textBold}>
+            Diego Bastos, Alicja Blonski, Katt McGuinness
+          </Text>
         </Text>
 
         {/* Difficulty Controls */}
