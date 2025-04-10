@@ -128,9 +128,16 @@ const Physics = (entities, { touches, time, dispatch }) => {
       });
     }
   }
-
+  // console.log(time.delta)
+  const targetDelta = 16.667
+  const triggers = Math.floor(time.delta / targetDelta)
+  const remainder = time.delta % targetDelta
+  // console.log(triggers, remainder)
   Matter.Events.on(engine, "collisionStart", collisionStart);
-  Matter.Engine.update(engine, time.delta);
+  for(let i = 0;i<triggers;i++) {
+    Matter.Engine.update(engine, targetDelta);
+  }
+  Matter.Engine.update(engine, remainder);
   Matter.Events.off(engine, "collisionStart", collisionStart)
 
   return entities;
