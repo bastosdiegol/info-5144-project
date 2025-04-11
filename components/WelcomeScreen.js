@@ -34,22 +34,23 @@ export default function WelcomeScreen({ navigation }) {
     });
   }, []);
 
-useEffect(() => {
+  useEffect(() => {
     const loadSounds = async () => {
       try {
         const { sound: background } = await Audio.Sound.createAsync(
           require('../assets/Sounds/background.mp3'),
           { isLooping: true, volume: 0.3 }
         );
-        
+
         const { sound: start } = await Audio.Sound.createAsync(
           require('../assets/Sounds/Start.mp3')
         );
 
         const { sound: button } = await Audio.Sound.createAsync(
           require('../assets/Sounds/button.mp3'),
-          { volume: 0.7}
+          { volume: 0.7 }
         );
+        
 
         setSoundObjects({
           background,
@@ -66,45 +67,45 @@ useEffect(() => {
     loadSounds();
 
 
-  return () => {
-    if (soundObjects.background) {
-      soundObjects.background.unloadAsync();
-    }
-    if (soundObjects.start) {
-      soundObjects.start.unloadAsync();
-    }
-    if (soundObjects.button) {
-      soundObjects.button.unloadAsync();
+    return () => {
+      if (soundObjects.background) {
+        soundObjects.background.unloadAsync();
+      }
+      if (soundObjects.start) {
+        soundObjects.start.unloadAsync();
+      }
+      if (soundObjects.button) {
+        soundObjects.button.unloadAsync();
+      }
+    };
+  }, []);
+
+  const handleGameSound = async ({ aiDifficulty, localMultiplayer }) => {
+    try {
+      if (soundObjects.background) {
+        await soundObjects.background.stopAsync();
+      }
+      if (soundObjects.start) {
+        await soundObjects.start.replayAsync();
+      }
+      navigation.navigate("Game", { aiDifficulty, localMultiplayer });
+    } catch (error) {
+      console.log('Error handling sounds:', error);
+      navigation.navigate("Game", { aiDifficulty, localMultiplayer });
     }
   };
-}, []);
 
-const handleGameSound = async () => {
-  try {
-    if (soundObjects.background) {
-      await soundObjects.background.stopAsync();
+  const playSound = async (sound) => {
+    try {
+      if (sound) {
+        await sound.replayAsync();
+      }
+    } catch (error) {
+      console.log('Error playing sound:', error);
     }
-    if (soundObjects.start) {
-      await soundObjects.start.replayAsync();
-    }
-    navigation.navigate("Game", { aiDifficulty });
-  } catch (error) {
-    console.log('Error handling sounds:', error);
-    navigation.navigate("Game", { aiDifficulty });
-  }
-};
+  };
 
-const playSound = async (sound) => {
-  try {
-    if (sound) {
-      await sound.replayAsync();
-    }
-  } catch (error) {
-    console.log('Error playing sound:', error);
-  }
-};
-
-const incrementDifficulty = async () => {
+  const incrementDifficulty = async () => {
     await playSound(soundObjects.button);
     // Prevent difficulty from going above 15.
     setAiDifficulty((prev) => Math.min(15, prev + 1));
@@ -135,26 +136,38 @@ const incrementDifficulty = async () => {
           </Text>
         </Text>
 
-        {/* Difficulty Controls */}
-        <View style={styles.difficultyContainer}>
-          <TouchableOpacity style={styles.button} onPress={decrementDifficulty}>
-            <Text style={styles.buttonText}>-</Text>
-          </TouchableOpacity>
-          <Text style={styles.difficultyText}>
-            AI Difficulty: {aiDifficulty}
-          </Text>
-          <TouchableOpacity style={styles.button} onPress={incrementDifficulty}>
-            <Text style={styles.buttonText}>+</Text>
-          </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View>
+            {/* Difficulty Controls */}
+            <View style={styles.difficultyContainer}>
+              <TouchableOpacity style={styles.button} onPress={decrementDifficulty}>
+                <Text style={styles.buttonText}>-</Text>
+              </TouchableOpacity>
+              <Text style={styles.difficultyText}>
+                AI Difficulty: {aiDifficulty}
+              </Text>
+              <TouchableOpacity style={styles.button} onPress={incrementDifficulty}>
+                <Text style={styles.buttonText}>+</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleGameSound({ aiDifficulty, localMultiplayer: false })}
+            >
+              <Text style={styles.buttonText}>Singleplayer Game</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleGameSound({ aiDifficulty: null, localMultiplayer: true })}
+            >
+              <Text style={styles.buttonText}>Multiplayer Game</Text>
+            </TouchableOpacity>
+
+          </View>
         </View>
 
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleGameSound}
-        >
-          <Text style={styles.buttonText}>New Game</Text>
-        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
@@ -168,10 +181,15 @@ const styles = StyleSheet.create({
   },
   info: {
     width: "100%",
-    height: "28%",
+    // height: "28%",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
+    padding: 20,
+    borderTopWidth: 2,
+    borderTopColor: 'blue',
+    borderBottomWidth: 2,
+    borderBottomColor: 'blue',
   },
   textBold: {
     fontWeight: "bold",
@@ -198,7 +216,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "bold",
     textAlign: "center",
   },

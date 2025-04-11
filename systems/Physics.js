@@ -22,9 +22,8 @@ const Physics = (entities, { touches, time, dispatch }) => {
     let clampedVelocity = clampVelocity(puck.velocity, MAX_VELOCITY);
     Matter.Body.setVelocity(puck, clampedVelocity);
   }
-  Matter.Engine.update(engine, time.delta);
 
-  Matter.Events.on(engine, "collisionStart", (event) => {
+  const collisionStart = (event) => {
     // Check if there are any collision pairs
     if (!event.pairs || event.pairs.length === 0) return;
     let pairs = event.pairs;
@@ -61,7 +60,7 @@ const Physics = (entities, { touches, time, dispatch }) => {
         Matter.Body.setVelocity(puck, newPuckVelocity);
       }
     }
-    Matter.Engine.update(engine, time.delta);
+    // Matter.Engine.update(engine, time.delta);
 
     // *** Handle Collision Events with Puck and Nets - Goal Detection **
     if (objALabel === "Puck" && objBLabel === "GoalNetTop") {
@@ -89,7 +88,7 @@ const Physics = (entities, { touches, time, dispatch }) => {
     if (isGoal) {
       // Stop the puck and update the engine
       Matter.Body.setVelocity(objA, { x: 0, y: 0 });
-      Matter.Engine.update(engine, time.delta);
+      // Matter.Engine.update(engine, time.delta);
     }
 
     // *** Handle Collision Events With Puck and Boundaries ***
@@ -128,8 +127,18 @@ const Physics = (entities, { touches, time, dispatch }) => {
         y: objA.velocity.y,
       });
     }
-  });
-  Matter.Engine.update(engine, time.delta);
+  }
+  // console.log(time.delta)
+  const targetDelta = 16.667
+  const triggers = Math.floor(time.delta / targetDelta)
+  const remainder = time.delta % targetDelta
+  // console.log(triggers, remainder)
+  Matter.Events.on(engine, "collisionStart", collisionStart);
+  for(let i = 0;i<triggers;i++) {
+    Matter.Engine.update(engine, targetDelta);
+  }
+  Matter.Engine.update(engine, remainder);
+  Matter.Events.off(engine, "collisionStart", collisionStart)
 
   return entities;
 };

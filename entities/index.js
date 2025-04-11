@@ -34,12 +34,37 @@ export default () => {
   const BOUNDARY_Y_BOTTOM = WINDOW_HEIGHT / 1.11;
   const NET_OFFSET = 50;
 
+  const centerBoundary = Matter.Bodies.rectangle(
+    WINDOW_WIDTH / 2,
+    WINDOW_HEIGHT / 2,
+    WINDOW_WIDTH,
+    10,
+    {
+      label: "CenterBoundary",
+      isStatic: true,
+      isSensor: true,
+      render: {
+        visible: false,
+      },
+      collisionFilter: {
+        category: 0x0002,
+        mask: 0x0004, //something other
+      },
+    }
+  );
+  Matter.World.add(world, centerBoundary);
+
+
   return {
     physics: { engine, world },
 
     Puck: Puck(world, "blue", PUCK_CENTER_START, PUCK_SIZE, {
       restitution: 0.9,
       label: "Puck",
+      collisionFilter: {
+        category: 0x0001,
+        mask: 0x0001,
+      },
     }),
 
     PaddlePlayerOne: Paddle(world, "blue", PADDLE_ONE_START, PADDLE_SIZE, {
@@ -143,5 +168,11 @@ export default () => {
       { width: BOUNDARY_SIZE, height: WINDOW_WIDTH * 2 },
       { isStatic: true, label: "BoundaryRight" }
     ),
+
+    CenterBoundary: {
+      body: centerBoundary,
+      renderer: () => null,
+    },
+
   };
 };
