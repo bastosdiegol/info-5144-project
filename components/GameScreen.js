@@ -13,6 +13,7 @@ import Input from "../systems/Input";
 import BoundaryCheck from "../systems/BoundaryCheck";
 import AIPaddle from "../systems/AIPaddle";
 import entities from "../entities/index";
+import { Audio } from 'expo-av';
 
 /**
  * GameScreen component
@@ -31,6 +32,84 @@ export default function GameScreen({ navigation, route }) {
 
   const aiDifficulty = route.params?.aiDifficulty || 3;
 
+
+  const [sounds, setSounds] = useState({
+    score: null,
+    win: null,
+    lose: null,
+    tie: null,
+    background: null,
+    newGame: null
+  });
+
+
+  useEffect(() => {
+    async function loadSounds() {
+      try {
+        const { sound: scoreSound } = await Audio.Sound.createAsync(
+          require('../assets/Sounds/score.mp3')
+        );
+
+        const { sound: winSound } = await Audio.Sound.createAsync(
+          require('../assets/Sounds/Win.mp3')
+        );
+
+        const { sound: loseSound } = await Audio.Sound.createAsync(
+          require('../assets/Sounds/Lose.mp3')
+        );
+
+        const { sound: tieSound } = await Audio.Sound.createAsync(
+          require('../assets/Sounds/Tie.mp3')
+        );
+
+        const { sound: background } = await Audio.Sound.createAsync(
+          require('../assets/Sounds/ingame.mp3'),
+          { isLooping: true, volume: 0.3 }
+        );
+        
+        const { sound: newGameSound } = await Audio.Sound.createAsync(
+          require('../assets/Sounds/newGame.mp3'),
+          { volume: 0.4, isLooping: false } 
+        );
+
+        setSounds({
+          score: scoreSound,
+          win: winSound,
+          lose: loseSound,
+          tie: tieSound,
+          background,
+          newGame: newGameSound
+        });
+
+        await background.playAsync();
+      } catch (error) {
+        console.error("Error loading sounds:", error);
+      }
+    }
+
+    loadSounds();
+
+    return () => {
+      sounds.score?.unloadAsync();
+      sounds.win?.unloadAsync();
+      sounds.lose?.unloadAsync();
+      sounds.tie?.unloadAsync();
+      sounds.background?.unloadAsync();
+      sounds.newGame?.unloadAsync();
+    };
+  }, []);
+
+
+  const playSound = async (soundObject) => {
+    try {
+      if (soundObject) {
+        await soundObject.replayAsync();
+      }
+    } catch (error) {
+      console.log("Error playing sound:", error);
+    }
+  };
+
   // Countdown Timer Effect
   useEffect(() => {
     if (gameTime > 0 && !isGameOver) {
@@ -47,17 +126,87 @@ export default function GameScreen({ navigation, route }) {
     }
   }, [gameTime, isGameOver]);
 
+
+  useEffect(() => {
+    const handleGameState = async () => {
+      try {
+        if (isGameOver) {
+          if (sounds.background) {
+            await sounds.background.stopAsync();
+          }
+          if (playerOneScore > playerTwoScore) {
+            await playSound(sounds.win);
+          } else if (playerTwoScore > playerOneScore) {
+            await playSound(sounds.lose);
+          } else {
+            await playSound(sounds.tie);
+          }
+          
+          if (sounds.newGame) {
+            await sounds.newGame.setIsLoopingAsync(true);
+            await sounds.newGame.replayAsync();
+          }
+        } else if (running) {
+          if (sounds.background) {
+            await sounds.background.playAsync();
+          }
+          if (sounds.newGame) {
+            await sounds.newGame.stopAsync();
+          }
+        }
+      } catch (error) {
+        console.log("Error handling game state:", error);
+      }
+    };
+
+    handleGameState();
+  }, [isGameOver, running]);
+
   // Function to start a new game
-  const startNewGame = () => {
+  const startNewGame = async () => {
+
+    try {
+      if (sounds.newGame) {
+        await sounds.newGame.stopAsync();
+        await sounds.newGame.setIsLoopingAsync(false);
+      }
+
     setPlayerOneScore(0);
     setPlayerTwoScore(0);
     setGameTime(MAX_GAME_TIME);
     setIsGameOver(false);
 
+    if (sounds.background) {
+      sounds.background.playAsync();
+    }
+
     setTimeout(() => {
       setRunning(true);
     }, 100);
+
+  } catch (error) {
+    console.log("Error in startNewGame:", error);
+  }
   };
+
+  useEffect(() => {
+    if (isGameOver) {
+      if (playerOneScore > playerTwoScore) {
+        playSound(sounds.win);  // Player wins
+      } else if (playerTwoScore > playerOneScore) {
+        playSound(sounds.lose); // Player loses
+      } else {
+        playSound(sounds.tie);  // It's a tie
+      }
+    }
+  }, [isGameOver, playerOneScore, playerTwoScore]);
+
+  useEffect(() => {
+    if (isGameOver && sounds.newGame) {
+      sounds.newGame.setIsLoopingAsync(true);
+      sounds.newGame.replayAsync();
+    }
+  }, [isGameOver]);
 
   const endGameMessage = () => {
     return (
@@ -73,15 +222,15 @@ export default function GameScreen({ navigation, route }) {
             playerTwoScore > playerOneScore
               ? styles.teamTextRed
               : playerOneScore > playerTwoScore
-              ? styles.teamTextBlue
-              : styles.timerText
+                ? styles.teamTextBlue
+                : styles.timerText
           }
         >
           {playerTwoScore > playerOneScore
             ? "Team Red Wins!"
             : playerTwoScore < playerOneScore
-            ? "Team Blue Wins!"
-            : "It's a Tie!"}
+              ? "Team Blue Wins!"
+              : "It's a Tie!"}
         </Text>
         <Text />
         <TouchableOpacity style={styles.button} onPress={startNewGame}>
@@ -127,9 +276,11 @@ export default function GameScreen({ navigation, route }) {
             onEvent={(e) => {
               if (e.type === "GOAL_TEAM_ONE") {
                 setPlayerOneScore(playerOneScore + 1);
+                playSound(sounds.score);
               }
               if (e.type === "GOAL_TEAM_TWO") {
                 setPlayerTwoScore(playerTwoScore + 1);
+                playSound(sounds.score);
               }
             }}
           ></GameEngine>

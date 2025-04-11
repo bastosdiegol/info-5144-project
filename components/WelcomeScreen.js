@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { GAME_BOARD_IMG } from "../utils/constants";
+import { Audio } from 'expo-av';
 
 /**
  * WelcomeScreen component
@@ -18,13 +19,99 @@ import { GAME_BOARD_IMG } from "../utils/constants";
  */
 export default function WelcomeScreen({ navigation }) {
   const [aiDifficulty, setAiDifficulty] = useState(3);
+  const [soundObjects, setSoundObjects] = useState({
+    background: null,
+    start: null,
+    button: null
+  });
 
-  const incrementDifficulty = () => {
+  useEffect(() => {
+    Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      staysActiveInBackground: false,
+      playsInSilentModeIOS: true,
+      shouldDuckAndroid: true,
+    });
+  }, []);
+
+useEffect(() => {
+    const loadSounds = async () => {
+      try {
+        const { sound: background } = await Audio.Sound.createAsync(
+          require('../assets/Sounds/background.mp3'),
+          { isLooping: true, volume: 0.3 }
+        );
+        
+        const { sound: start } = await Audio.Sound.createAsync(
+          require('../assets/Sounds/Start.mp3')
+        );
+
+        const { sound: button } = await Audio.Sound.createAsync(
+          require('../assets/Sounds/button.mp3'),
+          { volume: 0.7}
+        );
+
+        setSoundObjects({
+          background,
+          start,
+          button
+        });
+
+        await background.playAsync();
+      } catch (error) {
+        console.error("Sound loading error:", error);
+      }
+    };
+
+    loadSounds();
+
+
+  return () => {
+    if (soundObjects.background) {
+      soundObjects.background.unloadAsync();
+    }
+    if (soundObjects.start) {
+      soundObjects.start.unloadAsync();
+    }
+    if (soundObjects.button) {
+      soundObjects.button.unloadAsync();
+    }
+  };
+}, []);
+
+const handleGameSound = async () => {
+  try {
+    if (soundObjects.background) {
+      await soundObjects.background.stopAsync();
+    }
+    if (soundObjects.start) {
+      await soundObjects.start.replayAsync();
+    }
+    navigation.navigate("Game", { aiDifficulty });
+  } catch (error) {
+    console.log('Error handling sounds:', error);
+    navigation.navigate("Game", { aiDifficulty });
+  }
+};
+
+const playSound = async (sound) => {
+  try {
+    if (sound) {
+      await sound.replayAsync();
+    }
+  } catch (error) {
+    console.log('Error playing sound:', error);
+  }
+};
+
+const incrementDifficulty = async () => {
+    await playSound(soundObjects.button);
     // Prevent difficulty from going above 15.
     setAiDifficulty((prev) => Math.min(15, prev + 1));
   };
 
-  const decrementDifficulty = () => {
+  const decrementDifficulty = async () => {
+    await playSound(soundObjects.button);
     // Prevent difficulty from going below 1.
     setAiDifficulty((prev) => Math.max(1, prev - 1));
   };
@@ -61,9 +148,10 @@ export default function WelcomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
+
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("Game", { aiDifficulty })}
+          onPress={handleGameSound}
         >
           <Text style={styles.buttonText}>New Game</Text>
         </TouchableOpacity>
