@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -34,6 +34,7 @@ export default function GameScreen({ navigation, route }) {
   const aiDifficulty = route.params?.aiDifficulty || 3;
   const localMultiplayer = route.params?.localMultiplayer || false;
 
+  const backgroundRef = useRef(null);
 
   const [sounds, setSounds] = useState({
     score: null,
@@ -78,12 +79,15 @@ export default function GameScreen({ navigation, route }) {
           require('../assets/Sounds/change.mp3')
         );
 
+        backgroundRef.current = background;
+        await backgroundRef.current.playAsync();
+
         setSounds({
           score: scoreSound,
           win: winSound,
           lose: loseSound,
           tie: tieSound,
-          background,
+          background: backgroundRef.current,
           newGame: newGameSound,
           change: changeSound
         });
@@ -104,6 +108,13 @@ export default function GameScreen({ navigation, route }) {
       sounds.background?.unloadAsync();
       sounds.newGame?.unloadAsync();
       sounds.change?.unloadAsync();
+
+
+      if (backgroundRef.current) {
+        backgroundRef.current.stopAsync();
+        backgroundRef.current.unloadAsync();
+        backgroundRef.current = null;
+      }
     };
   }, [navigation]);
 
@@ -195,18 +206,6 @@ export default function GameScreen({ navigation, route }) {
       console.log("Error in startNewGame:", error);
     }
   };
-
-  useEffect(() => {
-    if (isGameOver) {
-      if (playerOneScore > playerTwoScore) {
-        playSound(sounds.win);  // Player wins
-      } else if (playerTwoScore > playerOneScore) {
-        playSound(sounds.lose); // Player loses
-      } else {
-        playSound(sounds.tie);  // It's a tie
-      }
-    }
-  }, [isGameOver, playerOneScore, playerTwoScore]);
 
   useEffect(() => {
     if (isGameOver && sounds.newGame) {
