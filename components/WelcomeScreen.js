@@ -48,25 +48,37 @@ export default function WelcomeScreen({ navigation }) {
           </Text>
         </Text>
 
-        {/* Difficulty Controls */}
-        <View style={styles.difficultyContainer}>
-          <TouchableOpacity style={styles.button} onPress={decrementDifficulty}>
-            <Text style={styles.buttonText}>-</Text>
-          </TouchableOpacity>
-          <Text style={styles.difficultyText}>
-            AI Difficulty: {aiDifficulty}
-          </Text>
-          <TouchableOpacity style={styles.button} onPress={incrementDifficulty}>
-            <Text style={styles.buttonText}>+</Text>
-          </TouchableOpacity>
-        </View>
+        <View style={{flexDirection:'row', alignItems:'center'}}>
+          <View>
+            {/* Difficulty Controls */}
+            <View style={styles.difficultyContainer}>
+              <TouchableOpacity style={styles.button} onPress={decrementDifficulty}>
+                <Text style={styles.buttonText}>-</Text>
+              </TouchableOpacity>
+              <Text style={styles.difficultyText}>
+                AI Difficulty: {aiDifficulty}
+              </Text>
+              <TouchableOpacity style={styles.button} onPress={incrementDifficulty}>
+                <Text style={styles.buttonText}>+</Text>
+              </TouchableOpacity>
+            </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Game", { aiDifficulty })}
-        >
-          <Text style={styles.buttonText}>New Game</Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate("Game", { aiDifficulty, localMultiplayer: false })}
+            >
+              <Text style={styles.buttonText}>Singleplayer Game</Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+          <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate("Game", { aiDifficulty: null, localMultiplayer: true })}
+            >
+              <Text style={styles.buttonText}>Multiplayer Game</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </ImageBackground>
   );
@@ -80,10 +92,15 @@ const styles = StyleSheet.create({
   },
   info: {
     width: "100%",
-    height: "28%",
+    // height: "28%",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
+    padding: 20,
+    borderTopWidth: 2,
+    borderTopColor: 'blue',
+    borderBottomWidth: 2,
+    borderBottomColor: 'blue',
   },
   textBold: {
     fontWeight: "bold",
@@ -110,7 +127,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "bold",
     textAlign: "center",
   },

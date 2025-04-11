@@ -10,6 +10,7 @@ import { WINDOW_WIDTH, WINDOW_HEIGHT, MAX_VELOCITY } from "../utils/constants";
  * @return {object} - The updated entities.
  */
 const AIPaddle = (entities, { time, aiDifficulty }) => {
+  if(!aiDifficulty) return entities
   const paddle = entities.PaddlePlayerTwo;
   const puck = entities.Puck;
 

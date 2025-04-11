@@ -1,4 +1,6 @@
+import { StatusBar } from "expo-status-bar";
 import { Dimensions } from "react-native";
+import ExpoConstants from 'expo-constants'
 
 /** Game Time in Seconds */
 export const MAX_GAME_TIME = 60;
@@ -14,6 +16,8 @@ export const PADDLE_RED_IMG = require("../assets/red-air-hockey-paddle.jpeg");
 export const WINDOW_WIDTH = Dimensions.get("window").width;
 /** Phone Screen Height */
 export const WINDOW_HEIGHT = Dimensions.get("window").height;
+/** Phone Top Bar Height */
+export const STATUS_BAR_HEIGHT = StatusBar.currentHeight || ExpoConstants.statusBarHeight
 /** Boundary Size */
 export const BOUNDARY_SIZE = 20;
 /** Paddle Size */
@@ -25,9 +29,9 @@ export const MAX_VELOCITY = 10;
 /** Paddle Max Allowed Distance */
 export const PADDLE_MAX_DISTANCE = 200;
 /** Paddle Player One Initial Location */
-export const PADDLE_ONE_START = { x: WINDOW_WIDTH / 2, y: WINDOW_HEIGHT - 100 };
+export const PADDLE_ONE_START = { x: WINDOW_WIDTH / 2, y: WINDOW_HEIGHT - 150 };
 /** Paddle Player Two Initial Location */
-export const PADDLE_TWO_START = { x: WINDOW_WIDTH / 2, y: 100 };
+export const PADDLE_TWO_START = { x: WINDOW_WIDTH / 2, y: 150 };
 /** Puck Initial Location */
 export const PUCK_CENTER_START = {
   x: WINDOW_WIDTH / 2,

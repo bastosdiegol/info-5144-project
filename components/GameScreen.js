@@ -6,10 +6,11 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
-import { MAX_GAME_TIME, GAME_BOARD_IMG } from "../utils/constants";
+import { MAX_GAME_TIME, GAME_BOARD_IMG, STATUS_BAR_HEIGHT } from "../utils/constants";
 import { GameEngine } from "react-native-game-engine";
 import Physics from "../systems/Physics";
-import Input from "../systems/Input";
+import InputSingleplayer from "../systems/InputSingleplayer";
+import InputMultiplayer from "../systems/InputMultiplayer";
 import BoundaryCheck from "../systems/BoundaryCheck";
 import AIPaddle from "../systems/AIPaddle";
 import entities from "../entities/index";
@@ -30,6 +31,7 @@ export default function GameScreen({ navigation, route }) {
   const [isGameOver, setIsGameOver] = useState(false);
 
   const aiDifficulty = route.params?.aiDifficulty || 3;
+  const localMultiplayer = route.params?.localMultiplayer || false;
 
   // Countdown Timer Effect
   useEffect(() => {
@@ -73,20 +75,25 @@ export default function GameScreen({ navigation, route }) {
             playerTwoScore > playerOneScore
               ? styles.teamTextRed
               : playerOneScore > playerTwoScore
-              ? styles.teamTextBlue
-              : styles.timerText
+                ? styles.teamTextBlue
+                : styles.timerText
           }
         >
           {playerTwoScore > playerOneScore
             ? "Team Red Wins!"
             : playerTwoScore < playerOneScore
-            ? "Team Blue Wins!"
-            : "It's a Tie!"}
+              ? "Team Blue Wins!"
+              : "It's a Tie!"}
         </Text>
         <Text />
-        <TouchableOpacity style={styles.button} onPress={startNewGame}>
-          <Text style={styles.buttonText}>New Game</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap:10 }}>
+          <TouchableOpacity style={styles.button} onPress={startNewGame}>
+            <Text style={styles.buttonText}>New Game</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.popTo('Welcome')}>
+            <Text style={styles.buttonText}>Change Settings</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };
@@ -97,7 +104,7 @@ export default function GameScreen({ navigation, route }) {
       <View style={styles.topInfo}>
         {/* Team Red AI and Score on one line */}
         <View style={styles.teamInfo}>
-          <Text style={styles.teamTextRed}>Team Red: AI</Text>
+          <Text style={styles.teamTextRed}>Team Red: {localMultiplayer?'Player 2':'AI'}</Text>
           <Text style={styles.scoreTextRed}>Score: {playerTwoScore}</Text>
         </View>
 
@@ -117,12 +124,11 @@ export default function GameScreen({ navigation, route }) {
           <GameEngine
             systems={[
               Physics,
-              Input,
+              localMultiplayer ? InputMultiplayer : InputSingleplayer,
               BoundaryCheck,
-              (entities, { time }) =>
-                AIPaddle(entities, { time, aiDifficulty }),
-            ]}
-            entities={entities()}
+              !localMultiplayer ? ((entities, engineArgs) => AIPaddle(entities, { ...engineArgs, aiDifficulty, localMultiplayer })) : null,
+            ].filter(fn => typeof fn === 'function')}
+            entities={entities(localMultiplayer)}
             running={running}
             onEvent={(e) => {
               if (e.type === "GOAL_TEAM_ONE") {
@@ -138,7 +144,7 @@ export default function GameScreen({ navigation, route }) {
 
       {/* Bottom Info */}
       <View style={styles.bottomInfo}>
-        <Text style={styles.teamTextBlue}>Team Blue: Player</Text>
+        <Text style={styles.teamTextBlue}>Team Blue: {localMultiplayer?'Player 1':'Player'}</Text>
         <Text style={styles.scoreTextBlue}>Score: {playerOneScore}</Text>
       </View>
     </View>
@@ -162,6 +168,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",
+    borderTopWidth: 2,
+    borderTopColor: 'blue',
+    borderBottomWidth: 2,
+    borderBottomColor: 'blue',
   },
   button: {
     backgroundColor: "#f8268c",
@@ -199,6 +209,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
     paddingHorizontal: 20,
+    borderBottomWidth: 2,
+    borderBottomColor: 'blue',
   },
   teamInfo: {
     paddingTop: 20,
@@ -212,7 +224,7 @@ const styles = StyleSheet.create({
   },
   bottomInfo: {
     position: "absolute",
-    bottom: 0,
+    bottom: STATUS_BAR_HEIGHT,
     width: "100%",
     height: "7.5%",
     flexDirection: "row",
@@ -220,6 +232,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     backgroundColor: "white",
+    borderTopWidth: 2,
+    borderTopColor: 'blue',
   },
   teamTextRed: {
     fontSize: 16,

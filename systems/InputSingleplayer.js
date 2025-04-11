@@ -11,7 +11,7 @@ import Matter from "matter-js";
  * @param {function} dispatch - The dispatch function to send actions.
  * @return {object} - The updated entities.
  */
-const Input = (entities, { touches, time, dispatch }) => {
+export default InputSingleplayer = (entities, { touches, time, dispatch }) => {
   touches.forEach((touch) => {
     const { pageX, pageY, identifier } = touch.event;
 
@@ -56,4 +56,3 @@ const Input = (entities, { touches, time, dispatch }) => {
   return entities;
 };
 
-export default Input;

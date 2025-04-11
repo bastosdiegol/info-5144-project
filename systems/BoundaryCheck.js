@@ -40,7 +40,7 @@ const BoundaryCheck = (entities, { time }) => {
     // Place puck slightly in front of the closest paddle
     const puckResetPos = {
       x: closestPaddleStart.x,
-      y: closestPaddleStart.y + (distToP1 < distToP2 ? -50 : 50),
+      y: closestPaddleStart.y + (distToP1 < distToP2 ? -100 : 100),
     };
 
     resetBody(puck, puckResetPos);
